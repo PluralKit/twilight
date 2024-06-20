@@ -1,4 +1,7 @@
-use crate::{config::ResourceType, CacheableGuild, CacheableModels, InMemoryCache, UpdateCache};
+use crate::{
+    config::ResourceType, traits::CacheableCurrentUser, CacheableGuild, CacheableModels,
+    InMemoryCache, UpdateCache,
+};
 use dashmap::DashMap;
 use std::{collections::HashSet, hash::Hash, mem};
 use twilight_model::{
@@ -38,6 +41,18 @@ impl<CacheModels: CacheableModels> InMemoryCache<CacheModels> {
         if self.wants(ResourceType::MEMBER) {
             self.guild_members.insert(guild.id, HashSet::new());
             self.cache_members(guild.id, mem::take(&mut guild.members));
+        } else if self.wants(ResourceType::MEMBER_CURRENT) {
+            if let Some(current_user) = self.current_user() {
+                let current_member = guild
+                    .members
+                    .iter()
+                    .find(|member| member.user.id == current_user.id());
+
+                if let Some(member) = current_member {
+                    self.guild_members.insert(guild.id, HashSet::new());
+                    self.cache_member(guild.id, member.to_owned());
+                }
+            }
         }
 
         if self.wants(ResourceType::PRESENCE) {
@@ -116,7 +131,7 @@ impl<CacheModels: CacheableModels> InMemoryCache<CacheModels> {
             self.voice_state_guilds.remove(&id);
         }
 
-        if self.wants(ResourceType::MEMBER) {
+        if self.wants(ResourceType::MEMBER) || self.wants(ResourceType::MEMBER_CURRENT) {
             if let Some((_, ids)) = self.guild_members.remove(&id) {
                 for user_id in ids {
                     self.members.remove(&(id, user_id));
