@@ -43,17 +43,28 @@ impl Deref for ComputedInteractionMember {
 /// [`Member`]: twilight_model::guild::Member
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
 pub struct CachedMember {
-    pub(crate) avatar: Option<ImageHash>,
-    pub(crate) communication_disabled_until: Option<Timestamp>,
-    pub(crate) deaf: Option<bool>,
-    pub(crate) flags: MemberFlags,
-    pub(crate) joined_at: Option<Timestamp>,
-    pub(crate) mute: Option<bool>,
-    pub(crate) nick: Option<String>,
-    pub(crate) pending: bool,
-    pub(crate) premium_since: Option<Timestamp>,
-    pub(crate) roles: Vec<Id<RoleMarker>>,
-    pub(crate) user_id: Id<UserMarker>,
+    ///
+    pub avatar: Option<ImageHash>,
+    ///
+    pub communication_disabled_until: Option<Timestamp>,
+    ///
+    pub deaf: Option<bool>,
+    ///
+    pub flags: MemberFlags,
+    ///
+    pub joined_at: Option<Timestamp>,
+    ///
+    pub mute: Option<bool>,
+    ///
+    pub nick: Option<String>,
+    ///
+    pub pending: bool,
+    ///
+    pub premium_since: Option<Timestamp>,
+    ///
+    pub roles: Vec<Id<RoleMarker>>,
+    ///
+    pub user_id: Id<UserMarker>,
 }
 
 impl CachedMember {
