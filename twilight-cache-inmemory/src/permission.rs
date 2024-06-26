@@ -221,7 +221,7 @@ impl RootError {
     /// Create a root error from an error while retrieving a member's roles.
     // clippy: the contents of `member_roles_error` is consumed
     #[allow(clippy::needless_pass_by_value)]
-    fn from_member_roles(member_roles_error: MemberRolesErrorType) -> Self {
+    pub fn from_member_roles(member_roles_error: MemberRolesErrorType) -> Self {
         Self {
             kind: match member_roles_error {
                 MemberRolesErrorType::RoleMissing { role_id } => {
@@ -284,17 +284,21 @@ pub enum RootErrorType {
 
 /// Error type that occurred while getting a member's assigned roles'
 /// permissions as well as the `@everyone` role's permissions.
-enum MemberRolesErrorType {
+// pk note: this is edited only to get rid of an annoying warning
+pub enum MemberRolesErrorType {
     /// Role is missing from the cache.
-    RoleMissing { role_id: Id<RoleMarker> },
+    RoleMissing {
+        /// The role that is missing.
+        role_id: Id<RoleMarker>,
+    },
 }
 
 /// Member's roles' permissions and the guild's `@everyone` role's permissions.
-struct MemberRoles {
+pub struct MemberRoles {
     /// User's roles and their permissions.
-    assigned: Vec<(Id<RoleMarker>, Permissions)>,
+    pub assigned: Vec<(Id<RoleMarker>, Permissions)>,
     /// Permissions of the guild's `@everyone` role.
-    everyone: Permissions,
+    pub everyone: Permissions,
 }
 
 /// Calculate the permissions of a member with information from the cache.
@@ -522,7 +526,7 @@ impl<'a, CacheModels: CacheableModels> InMemoryCachePermissions<'a, CacheModels>
     /// [`communication_disabled_until`]: CachedMember::communication_disabled_until
     /// [administrator permission]: Permissions::ADMINISTRATOR
     /// [read-only permissions]: MEMBER_COMMUNICATION_DISABLED_ALLOWLIST
-    fn disable_member_communication(
+    pub fn disable_member_communication(
         &self,
         member: &CacheModels::Member,
         permissions: Permissions,
@@ -572,7 +576,7 @@ impl<'a, CacheModels: CacheableModels> InMemoryCachePermissions<'a, CacheModels>
     ///
     /// Returns [`MemberRolesErrorType::RoleMissing`] if a role is missing from
     /// the cache.
-    fn member_roles(
+    pub fn member_roles(
         &self,
         guild_id: Id<GuildMarker>,
         member: &'a CacheModels::Member,
@@ -603,7 +607,7 @@ impl<'a, CacheModels: CacheableModels> InMemoryCachePermissions<'a, CacheModels>
 
     /// Given a thread channel, retrieve its parent from the cache, and combine
     /// parent and child permissions.
-    fn parent_overwrites(
+    pub fn parent_overwrites(
         &self,
         thread: &CacheModels::Channel,
     ) -> Result<Vec<PermissionOverwrite>, ChannelError> {
