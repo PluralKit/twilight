@@ -96,7 +96,7 @@ impl<'de> Visitor<'de> for PermissionsVisitor {
     }
 
     fn visit_u64<E: DeError>(self, v: u64) -> Result<Self::Value, E> {
-        Ok(Permissions::from_bits_truncate(v))
+        Ok(Permissions::from_bits_retain(v))
     }
 
     fn visit_str<E: DeError>(self, v: &str) -> Result<Self::Value, E> {
