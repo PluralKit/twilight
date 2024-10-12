@@ -738,7 +738,7 @@ impl<Q: Queue> Shard<Q> {
                     },
                     source: Some("missing sequence".into()),
                 })?;
-                tracing::debug!(%event_type, %sequence, "received dispatch");
+                // tracing::debug!(%event_type, %sequence, "received dispatch");
 
                 match event_type.as_ref() {
                     "READY" => {
@@ -767,7 +767,7 @@ impl<Q: Queue> Shard<Q> {
             Some(OpCode::HeartbeatAck) => {
                 let requested = self.latency.received().is_none() && self.latency.sent().is_some();
                 if requested {
-                    tracing::debug!("received heartbeat ack");
+                    // tracing::debug!("received heartbeat ack");
                     self.latency.record_received();
                 } else {
                     tracing::info!("received unrequested heartbeat ack");
