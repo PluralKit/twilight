@@ -4,6 +4,7 @@ use twilight_model::{
     gateway::payload::incoming::{ChannelCreate, ChannelDelete, ChannelPinsUpdate, ChannelUpdate},
     id::{marker::ChannelMarker, Id},
 };
+use tracing::info;
 
 impl<CacheModels: CacheableModels> InMemoryCache<CacheModels> {
     pub(crate) fn cache_channels(&self, channels: impl IntoIterator<Item = Channel>) {
@@ -34,6 +35,7 @@ impl<CacheModels: CacheableModels> InMemoryCache<CacheModels> {
                 let maybe_channels = self.guild_channels.get_mut(&guild_id);
 
                 if let Some(mut channels) = maybe_channels {
+                    info!("removing deleted channel {channel_id} from cache");
                     channels.remove(&channel_id);
                 }
             }
@@ -46,6 +48,8 @@ impl<CacheModels: CacheableModels> UpdateCache<CacheModels> for ChannelCreate {
         if !cache.wants(ResourceType::CHANNEL) {
             return;
         }
+
+        info!("adding newly created channel {} to cache", self.0.clone().id);
 
         cache.cache_channel(self.0.clone());
     }
