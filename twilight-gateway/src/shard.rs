@@ -60,6 +60,8 @@ use twilight_model::gateway::{
     CloseCode, CloseFrame, Intents, OpCode,
 };
 
+use tracing::{debug, warn};
+
 /// URL of the Discord gateway.
 const GATEWAY_URL: &str = "wss://gateway.discord.gg";
 
@@ -861,6 +863,7 @@ impl<Q: Queue + Unpin> Stream for Shard<Q> {
                         let tls = self.config.tls.clone();
                         self.connection_future = Some(ConnectionFuture(Box::pin(async move {
                             let secs = 2u8.saturating_pow(reconnect_attempts.into());
+                            debug!("sleeping for {secs} before connecting");
                             time::sleep(Duration::from_secs(secs.into())).await;
 
                             Ok(ClientBuilder::new()
@@ -879,6 +882,7 @@ impl<Q: Queue + Unpin> Stream for Shard<Q> {
                     self.connection_future = None;
                     match res {
                         Ok(connection) => {
+                            debug!("at connection");
                             self.connection = Some(connection);
                             self.state = ShardState::Identifying;
                             #[cfg(feature = "zstd")]
@@ -891,6 +895,7 @@ impl<Q: Queue + Unpin> Stream for Shard<Q> {
                             self.inflater.reset();
                         }
                         Err(source) => {
+                            warn!("connection error: {source}");
                             self.resume_url = None;
                             self.state = ShardState::Disconnected {
                                 reconnect_attempts: reconnect_attempts + 1,
